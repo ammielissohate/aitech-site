@@ -89,7 +89,26 @@ export interface Advantage {
   icon: IconKey;
 }
 
-export type ProjectCategory = "brand-design" | "content-visibility" | "web-experience";
+/** Présentation du fondateur (page /a-propos). */
+export interface Founder {
+  /** Laisser vide tant que non renseigné : la page affiche alors « Fondateur de AiTech ». */
+  name: string;
+  role: string;
+  /** Photo dans `public/images/`. Sans photo, un monogramme AiTech est affiché. */
+  photo?: { src: string; alt: string; width: number; height: number };
+  /** Phrase d'accroche sous le titre. */
+  intro: string;
+  /** Quelques paragraphes courts : parcours et vision. Pas un CV. */
+  story: string[];
+  /** Compétences regroupées par pilier : elles servent les offres, elles n'en sont pas. */
+  expertiseByPillar: { pillar: PillarSlug; title: string; skills: string[] }[];
+  /** Outils utilisés au quotidien (moyens, pas prestations). */
+  tools: string[];
+  /** Façon de travailler, 3 points maximum. */
+  principles: { title: string; description: string }[];
+}
+
+export type ProjectCategory ="brand-design" | "content-visibility" | "web-experience";
 
 /**
  * Cadre dans lequel le projet a été réalisé.

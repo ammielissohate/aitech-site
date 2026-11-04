@@ -10,9 +10,14 @@ export function WhyAitech() {
       <div className="grid gap-14 lg:grid-cols-12 lg:gap-10">
         <div className="lg:col-span-5">
           <SectionHeading id="why-title" {...whySection} />
-          <ButtonLink href="#contact" variant="secondary" withArrow className="reveal mt-10">
-            Parlons de votre projet
-          </ButtonLink>
+          <div className="reveal mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <ButtonLink href="#contact" variant="secondary" withArrow>
+              Parlons de votre projet
+            </ButtonLink>
+            <ButtonLink href="/a-propos" variant="ghost">
+              Découvrir le fondateur
+            </ButtonLink>
+          </div>
         </div>
 
         <ul className="grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2 lg:col-span-7">

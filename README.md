@@ -52,6 +52,7 @@ Tout se fait dans **`src/data/`**, sans toucher aux composants.
 - [ ] **`src/data/site.ts`** → `contact.location` : par exemple « Basé à Cotonou, disponible à distance ».
 - [ ] **`src/data/site.ts`** → `socials` : renseignez les URL. Un réseau sans URL n'est pas affiché.
 - [ ] **`src/data/projects.ts`** → ajoutez vos réalisations réelles (voir plus bas).
+- [ ] **`src/data/about.ts`** → votre nom, votre photo, et une relecture des paragraphes de présentation (page `/a-propos`).
 - [ ] **Vercel** → variable `NEXT_PUBLIC_SITE_URL` = votre domaine définitif.
 
 > Tant que ni l'e-mail ni le WhatsApp ne sont renseignés, les boutons du formulaire restent désactivés. Un avertissement le signale en développement.
@@ -73,6 +74,14 @@ Chaque section de la page lit ses textes dans un fichier de `src/data/` :
 | `projects.ts`      | Réalisations                                                                |
 | `advantages.ts`    | Section « Pourquoi AiTech ? »                                               |
 | `contact.ts`       | Textes et messages du formulaire                                            |
+| `about.ts`         | Page « À propos » : présentation du fondateur, photo, compétences par pilier |
+
+### Ajouter votre photo (page À propos)
+
+1. Déposez votre photo dans `public/images/`, par exemple `fondateur.jpg` (format portrait, idéalement 1200 × 1500 px).
+2. Dans `src/data/about.ts`, renseignez `name`, puis décommentez la ligne `photo` et ajustez `src` et `alt`.
+
+Sans photo, la page affiche un monogramme « Ai ». En développement, une étiquette « Photo à ajouter » s'y ajoute.
 
 ### Ajouter une réalisation
 
@@ -157,6 +166,7 @@ src/
 │   ├── layout.tsx              # Polices, métadonnées SEO globales, header/footer
 │   ├── page.tsx                # Landing : assemblage des sections + données structurées
 │   ├── solutions/[slug]/       # 3 pages piliers générées depuis services.ts
+│   ├── a-propos/               # Présentation du fondateur (données : about.ts)
 │   ├── not-found.tsx           # Page 404
 │   ├── sitemap.ts · robots.ts  # Générés automatiquement
 │   ├── opengraph-image.tsx     # Image de partage 1200×630 générée au build

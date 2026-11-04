@@ -1,0 +1,209 @@
+@import "tailwindcss";
+
+/* ──────────────────────────────────────────────────────────────
+   Design tokens AiTech
+   Palette officielle + nuances fonctionnelles (contraste vérifié).
+   ────────────────────────────────────────────────────────────── */
+@theme {
+  /* Violets */
+  --color-brand: #7c3aed; /* Violet principal : boutons, grands éléments (≈3:1 sur noir → pas pour le petit texte) */
+  --color-brand-2: #9b5de5; /* Violet secondaire : dégradés */
+  --color-brand-3: #a78bfa; /* Violet clair : accents textuels sur fond sombre (≈7:1) */
+  --color-brand-deep: #5b21b6; /* Accents textuels sur fond clair (≈7:1 sur #F4F4F8) */
+
+  /* Neutres */
+  --color-ink: #09090f; /* Noir profond */
+  --color-ink-2: #12121c; /* Noir secondaire */
+  --color-ink-3: #1b1b29; /* Surfaces surélevées sur fond sombre */
+  --color-mist: #f4f4f8; /* Gris clair : sections claires */
+  --color-muted: #a1a1aa; /* Texte secondaire sur fond sombre (≈7.6:1) */
+  --color-muted-ink: #52525b; /* Texte secondaire sur fond clair (≈7:1) */
+  --color-line: rgb(255 255 255 / 0.09); /* Bordures fines sur fond sombre */
+  --color-line-ink: rgb(9 9 15 / 0.1); /* Bordures fines sur fond clair */
+
+  /* Typographies (chargées via next/font dans layout.tsx) */
+  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Animations */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─── Base ─── */
+html {
+  scroll-behavior: smooth;
+  /* Compense la navigation fixe lors des sauts d'ancre. */
+  scroll-padding-top: 5.5rem;
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-ink);
+  color: #fff;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-brand);
+  color: #fff;
+}
+
+/* Focus clavier visible et cohérent sur tout le site. */
+:focus-visible {
+  outline: 2px solid var(--color-brand-3);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ─── Utilitaires de marque ─── */
+@utility text-gradient {
+  background: linear-gradient(100deg, #fff 0%, var(--color-brand-3) 55%, var(--color-brand-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Verre dépoli maîtrisé : réservé à la navigation et à quelques cartes. */
+@utility glass {
+  /* Opacité suffisante pour rester lisible au-dessus des sections claires. */
+  background: rgb(18 18 28 / 0.84);
+  --tw-backdrop-blur: blur(16px);
+  --tw-backdrop-saturate: saturate(140%);
+  -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-saturate);
+  backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-saturate);
+}
+
+/* Fine trame de fond pour donner de la matière aux sections sombres. */
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+/* ─── Apparition au défilement (CSS uniquement, sans JavaScript) ───
+   Utilise les « scroll-driven animations » quand le navigateur les supporte.
+   Sinon, le contenu est simplement affiché : aucune perte de lisibilité. */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
+}
+
+/* ─── Visuel du hero ─── */
+@keyframes hero-wave {
+  0% {
+    transform: scale(0.55);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.18);
+    opacity: 0;
+  }
+}
+
+@keyframes hero-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hero-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes hero-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.hero-wave {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hero-wave 6s var(--ease-out-soft) infinite;
+}
+.hero-wave:nth-of-type(2) {
+  animation-delay: 2s;
+}
+.hero-wave:nth-of-type(3) {
+  animation-delay: 4s;
+}
+
+.hero-orbit {
+  transform-origin: 260px 260px;
+  animation: hero-orbit 48s linear infinite;
+}
+.hero-orbit--reverse {
+  animation-duration: 70s;
+  animation-direction: reverse;
+}
+
+.hero-growth {
+  stroke-dasharray: 1;
+  animation: hero-draw 2.4s 0.4s var(--ease-out-soft) both;
+}
+
+.hero-chip {
+  animation: hero-float 7s ease-in-out infinite;
+}
+.hero-chip:nth-child(2) {
+  animation-delay: -2.3s;
+}
+.hero-chip:nth-child(3) {
+  animation-delay: -4.6s;
+}
+
+/* ─── Accessibilité : réduction des animations ─── */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  /* Les ondes restent visibles, figées, au lieu de disparaître. */
+  .hero-wave {
+    animation: none;
+    opacity: 0.35;
+  }
+}
+
+/* ─── Menu mobile (élément <dialog> natif : focus piégé et touche Échap gérés par le navigateur) ─── */
+dialog.mobile-menu::backdrop {
+  background: rgb(9 9 15 / 0.7);
+  backdrop-filter: blur(4px);
+}

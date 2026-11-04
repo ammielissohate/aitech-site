@@ -108,35 +108,46 @@ export interface Founder {
   principles: { title: string; description: string }[];
 }
 
-export type ProjectCategory ="brand-design" | "content-visibility" | "web-experience";
-
 /**
  * Cadre dans lequel le projet a été réalisé.
  * Sert à ne jamais présenter un employeur ou un projet personnel comme un client AiTech.
  */
 export type ProjectContext = "client-aitech" | "salarie" | "personnel" | "formation";
 
+/** Image d'une réalisation, hébergée sur Vercel Blob. */
+export interface ProjectImage {
+  url: string;
+  width: number;
+  height: number;
+  alt: string;
+}
+
+/**
+ * Réalisation du portfolio, enregistrée en base (gérée depuis l'admin du site).
+ * Chaque réalisation est rattachée à l'un des trois piliers.
+ */
 export interface Project {
   id: string;
-  /**
-   * `draft` : visible uniquement en développement (`npm run dev`), avec un badge « À compléter ».
-   * `published` : visible en production.
-   */
-  status: "draft" | "published";
+  /** Identifiant lisible, utilisé dans l'ancre de partage (#projet-<slug>). */
+  slug: string;
+  /** `false` = brouillon, visible uniquement dans l'espace admin. */
+  published: boolean;
   title: string;
-  category: ProjectCategory;
+  pillar: PillarSlug;
   context: ProjectContext;
-  /** Nom du client ou de l'organisation, uniquement si vous avez l'autorisation de l'afficher. */
-  clientName?: string;
-  description: string;
-  /** Problème ou besoin initial, si connu. */
-  need?: string;
+  /** Nom du client ou de l'organisation, uniquement avec son autorisation. */
+  clientName: string | null;
+  year: number | null;
+  /** Résumé court affiché sur la carte. */
+  summary: string;
+  /** Besoin ou problème de départ, si connu. */
+  need: string | null;
   solution: string;
   /** Résultat uniquement s'il est documenté et vérifiable. */
-  result?: string;
-  /** Chemin depuis `public/`, par exemple `/projects/mon-projet.jpg`. */
-  image?: { src: string; alt: string; width: number; height: number };
+  result: string | null;
   /** Lien externe optionnel (site en ligne, publication…). */
-  link?: string;
-  year?: number;
+  link: string | null;
+  /** La première image sert de couverture. */
+  images: ProjectImage[];
+  createdAt: string;
 }

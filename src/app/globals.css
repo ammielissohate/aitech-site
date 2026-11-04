@@ -202,6 +202,26 @@ body {
   }
 }
 
+/* ─── Mode administrateur ───
+   Les boutons « Ajouter » / « Modifier » sont masqués pour les visiteurs.
+   AdminBar ajoute l'attribut data-admin sur <html> quand l'administrateur est connecté.
+   (Simple confort d'affichage : chaque action est revérifiée côté serveur.) */
+.admin-only {
+  display: none !important;
+}
+html[data-admin] .admin-only {
+  display: inline-flex !important;
+}
+html[data-admin] body {
+  padding-bottom: 4.5rem; /* place pour la barre admin fixe */
+}
+
+/* Fiche réalisation en plein écran */
+dialog.project-lightbox::backdrop {
+  background: rgb(9 9 15 / 0.85);
+  backdrop-filter: blur(6px);
+}
+
 /* ─── Menu mobile (élément <dialog> natif : focus piégé et touche Échap gérés par le navigateur) ─── */
 dialog.mobile-menu::backdrop {
   background: rgb(9 9 15 / 0.7);

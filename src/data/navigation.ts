@@ -7,6 +7,7 @@ import type { NavItem } from "@/types/content";
 export const mainNavigation: NavItem[] = [
   { label: "Accueil", href: "/#accueil" },
   { label: "Nos solutions", href: "/#solutions" },
+  { label: "Réalisations", href: "/realisations" },
   { label: "À propos", href: "/a-propos" },
   { label: "Contact", href: "/#contact" },
 ];

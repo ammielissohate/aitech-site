@@ -1,36 +1,37 @@
-import type { Project, ProjectCategory, ProjectContext } from "@/types/content";
+import type { ProjectContext } from "@/types/content";
 
 /**
- * Réalisations affichées dans la section « Nos réalisations ».
+ * Textes de la galerie de réalisations.
  *
- * Pour ajouter un projet :
- *  1. Déposez l'image dans `public/projects/` (idéalement 1600 × 1000 px, en .jpg ou .webp).
- *  2. Copiez le modèle ci-dessous, complétez-le et passez `status` à "published".
- *
- * Règles :
- *  - `context` indique le cadre réel du projet. Un projet réalisé comme salarié
- *    ou un projet personnel n'est jamais présenté comme un client AiTech.
- *  - `clientName` uniquement avec l'autorisation du client.
- *  - `result` uniquement s'il est documenté et vérifiable.
- *
- * Les projets en `draft` sont visibles uniquement en développement.
+ * Les réalisations elles-mêmes ne sont plus dans ce fichier : elles s'ajoutent
+ * depuis le site, dans l'espace admin (/connexion), et sont enregistrées en base.
  */
 export const projectsSection = {
   eyebrow: "Nos réalisations",
   title: "Du travail concret. Des solutions pensées pour chaque besoin.",
-  intro: "Une sélection de projets présentés avec leur besoin de départ et la solution apportée.",
+  intro: "Parcourez nos réalisations par levier : image de marque, visibilité et croissance digitale.",
+  allLabel: "Tous les travaux",
+  seeAll: "Voir toutes les réalisations",
+  /** Nombre de réalisations affichées sur la page d'accueil (les autres sont sur /realisations). */
+  homeLimit: 6,
   emptyState: {
     title: "Nos réalisations sont en cours de documentation.",
     text: "Nous préparons des fiches détaillées pour chaque projet. En attendant, nous pouvons vous présenter des exemples adaptés à votre secteur lors d'un premier échange.",
     cta: "Demander des exemples",
   },
+  /** État vide sur une page solution, quand ce pôle n'a pas encore de réalisation publiée. */
+  emptyPillar: "Les réalisations de ce levier sont en cours de documentation. Demandez-nous des exemples adaptés à votre secteur.",
+  page: {
+    title: "Nos réalisations",
+    intro:
+      "Identités visuelles, contenus, sites et parcours de conversion : chaque projet est présenté avec son besoin de départ et la solution apportée.",
+    seo: {
+      title: "Réalisations : branding, contenus et sites web",
+      description:
+        "Découvrez les réalisations de AiTech : identités visuelles, contenus pour les réseaux sociaux, sites web et landing pages.",
+    },
+  },
 };
-
-export const projectCategories: { value: ProjectCategory; label: string }[] = [
-  { value: "brand-design", label: "Brand & Design" },
-  { value: "content-visibility", label: "Content & Visibility" },
-  { value: "web-experience", label: "Web & Digital Experience" },
-];
 
 export const projectContextLabels: Record<ProjectContext, string> = {
   "client-aitech": "Projet client AiTech",
@@ -38,28 +39,3 @@ export const projectContextLabels: Record<ProjectContext, string> = {
   personnel: "Projet personnel",
   formation: "Projet de formation",
 };
-
-export const projects: Project[] = [
-  // ─── MODÈLE À DUPLIQUER (visible uniquement en développement) ───
-  {
-    id: "modele-projet",
-    status: "draft",
-    title: "Titre du projet à compléter",
-    category: "web-experience",
-    context: "personnel",
-    description: "Une phrase qui résume le projet et son objectif.",
-    need: "Le besoin ou le problème de départ, s'il est connu.",
-    solution: "Ce qui a été conçu et réalisé pour y répondre.",
-    // result: "Uniquement un résultat documenté.",
-    // image: { src: "/projects/mon-projet.jpg", alt: "Description de l'image", width: 1600, height: 1000 },
-  },
-];
-
-/**
- * Projets à afficher selon l'environnement :
- * tous en développement, uniquement les projets publiés en production.
- */
-export function getVisibleProjects(): Project[] {
-  const isDevelopment = process.env.NODE_ENV === "development";
-  return projects.filter((project) => project.status === "published" || isDevelopment);
-}

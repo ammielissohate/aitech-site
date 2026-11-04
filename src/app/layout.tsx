@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Sora } from "next/font/google";
+import { Suspense } from "react";
+import { AdminBar } from "@/components/admin/AdminBar";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { siteConfig } from "@/data/site";
@@ -59,6 +61,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Header />
         <main id="contenu">{children}</main>
         <Footer />
+        {/* Lecture du cookie admin isolée sous Suspense : les pages restent statiques pour les visiteurs. */}
+        <Suspense fallback={null}>
+          <AdminBar />
+        </Suspense>
       </body>
     </html>
   );

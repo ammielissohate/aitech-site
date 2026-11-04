@@ -7,7 +7,11 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { Section } from "@/components/ui/Section";
 import { FinalCta } from "@/components/sections/FinalCta";
+import { ProjectGallery } from "@/components/projects/ProjectGallery";
+import { projectsSection } from "@/data/projects";
 import { getPillarBySlug, pillars } from "@/data/services";
+import { getPublishedProjects } from "@/lib/projects/repository";
+import type { Pillar } from "@/types/content";
 
 /** Les trois pages sont générées statiquement au build, à partir de `src/data/services.ts`. */
 export function generateStaticParams() {
@@ -130,6 +134,9 @@ async function SolutionContent({ params }: { params: PageProps<"/solutions/[slug
         </ul>
       </Section>
 
+      {/* Réalisations de ce pilier : la preuve par l'exemple */}
+      <PillarProjects pillar={pillar} />
+
       {/* Livrables, indicateurs, outils */}
       <Section tone="darker" labelledBy="details-title">
         <h2 id="details-title" className="sr-only">
@@ -193,5 +200,43 @@ function DetailList({ title, items, note }: { title: string; items: string[]; no
       </ul>
       {note && <p className="mt-5 border-t border-line pt-4 text-xs leading-relaxed text-muted">{note}</p>}
     </div>
+  );
+}
+
+/** Galerie des réalisations publiées pour ce pilier (ou état vide honnête). */
+async function PillarProjects({ pillar }: { pillar: Pillar }) {
+  const projects = (await getPublishedProjects()).filter((project) => project.pillar === pillar.slug);
+
+  return (
+    <Section tone="light" labelledBy="pillar-projects-title">
+      <div className="max-w-3xl">
+        <p className="mb-5 inline-flex items-center gap-2 text-xs font-semibold tracking-[0.2em] text-brand-deep uppercase">
+          <span aria-hidden="true" className="h-px w-6 bg-brand-deep" />
+          Réalisations
+        </p>
+        <h2 id="pillar-projects-title" className="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+          Nos travaux en {pillar.name}
+        </h2>
+      </div>
+
+      {projects.length > 0 ? (
+        <ProjectGallery projects={projects} pillar={pillar.slug} />
+      ) : (
+        <div className="mt-10 flex flex-col items-start gap-4 rounded-3xl border border-dashed border-brand-deep/30 bg-white p-8 sm:flex-row sm:items-center sm:justify-between">
+          <p className="max-w-2xl leading-relaxed text-muted-ink">{projectsSection.emptyPillar}</p>
+          <div className="flex shrink-0 flex-wrap gap-3">
+            <Link href={`/#contact-${pillar.slug}`} className="rounded-full bg-ink px-5 py-3 text-sm font-medium text-white hover:bg-ink-3">
+              Demander des exemples
+            </Link>
+            <Link
+              href={`/admin/editer?pilier=${pillar.slug}`}
+              className="admin-only items-center rounded-full border-2 border-dashed border-amber-400 bg-amber-300/15 px-5 py-3 text-sm font-semibold text-amber-700"
+            >
+              + Ajouter un travail
+            </Link>
+          </div>
+        </div>
+      )}
+    </Section>
   );
 }

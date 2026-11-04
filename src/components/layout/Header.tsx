@@ -38,7 +38,7 @@ export function Header() {
       <div className="mx-auto flex h-18 max-w-7xl items-center justify-between gap-6 px-5 sm:px-8">
         <Logo />
 
-        <nav aria-label="Navigation principale" className="hidden md:block">
+        <nav aria-label="Navigation principale" className="hidden lg:block">
           <ul className="flex items-center gap-8">
             {mainNavigation.map((item) => (
               <li key={item.href}>
@@ -62,7 +62,7 @@ export function Header() {
             onClick={openMenu}
             aria-haspopup="dialog"
             aria-controls="mobile-menu"
-            className="inline-flex size-11 items-center justify-center rounded-full border border-line text-white md:hidden"
+            className="inline-flex size-11 items-center justify-center rounded-full border border-line text-white lg:hidden"
           >
             <Menu aria-hidden="true" className="size-5" />
             <span className="sr-only">Ouvrir le menu</span>

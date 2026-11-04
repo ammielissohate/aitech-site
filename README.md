@@ -14,6 +14,7 @@ Landing page orientée conversion et trois pages « solutions », construites av
 3. [Modifier les contenus](#3-modifier-les-contenus)
 4. [Le formulaire de contact](#4-le-formulaire-de-contact)
 5. [Déployer sur Vercel](#5-déployer-sur-vercel)
+5 bis. [Espace admin : gérer vos réalisations](#5-bis-espace-admin--gérer-vos-réalisations)
 6. [Architecture du projet](#6-architecture-du-projet)
 7. [Qualité : lint, types, tests, build](#7-qualité--lint-types-tests-build)
 8. [Notes techniques et limites connues](#8-notes-techniques-et-limites-connues)
@@ -51,7 +52,7 @@ Tout se fait dans **`src/data/`**, sans toucher aux composants.
 - [ ] **`src/data/site.ts`** → `contact.whatsapp` : numéro au format international, chiffres uniquement (ex. `2290100000000`).
 - [ ] **`src/data/site.ts`** → `contact.location` : par exemple « Basé à Cotonou, disponible à distance ».
 - [ ] **`src/data/site.ts`** → `socials` : renseignez les URL. Un réseau sans URL n'est pas affiché.
-- [ ] **`src/data/projects.ts`** → ajoutez vos réalisations réelles (voir plus bas).
+- [ ] **Espace admin** → configurez-le (section 5 bis), puis ajoutez vos réalisations depuis le site.
 - [ ] **`src/data/about.ts`** → votre nom, votre photo, et une relecture des paragraphes de présentation (page `/a-propos`).
 - [ ] **Vercel** → variable `NEXT_PUBLIC_SITE_URL` = votre domaine définitif.
 
@@ -71,7 +72,7 @@ Chaque section de la page lit ses textes dans un fichier de `src/data/` :
 | `problems.ts`      | Section « Le constat » (problèmes des clients)                              |
 | `services.ts`      | **Les trois piliers** : cartes de la landing **et** pages `/solutions/...`  |
 | `method.ts`        | Les quatre étapes de la méthode                                             |
-| `projects.ts`      | Réalisations                                                                |
+| `projects.ts`      | Textes de la galerie (les réalisations elles-mêmes s'ajoutent depuis le site) |
 | `advantages.ts`    | Section « Pourquoi AiTech ? »                                               |
 | `contact.ts`       | Textes et messages du formulaire                                            |
 | `about.ts`         | Page « À propos » : présentation du fondateur, photo, compétences par pilier |
@@ -85,33 +86,7 @@ Sans photo, la page affiche un monogramme « Ai ». En développement, une étiq
 
 ### Ajouter une réalisation
 
-1. Déposez l'image dans `public/projects/` (idéalement 1600 × 1000 px, en `.jpg` ou `.webp`).
-2. Dans `src/data/projects.ts`, dupliquez le modèle et complétez-le :
-
-```ts
-{
-  id: "site-cabinet-x",
-  status: "published",            // "draft" = visible seulement en développement
-  title: "Site vitrine d'un cabinet de conseil",
-  category: "web-experience",     // "brand-design" | "content-visibility" | "web-experience"
-  context: "client-aitech",       // "client-aitech" | "salarie" | "personnel" | "formation"
-  clientName: "Cabinet X",        // seulement avec l'accord du client
-  description: "…",
-  need: "…",                      // facultatif
-  solution: "…",
-  result: "…",                    // seulement si le résultat est documenté
-  image: { src: "/projects/site-cabinet-x.jpg", alt: "…", width: 1600, height: 1000 },
-  link: "https://…",              // facultatif
-  year: 2026,                     // facultatif
-},
-```
-
-Règles de contenu, à respecter pour la crédibilité du studio :
-- `context` indique le cadre réel du projet. Un projet réalisé comme salarié ou à titre personnel n'est **jamais** présenté comme un client AiTech.
-- N'indiquez ni `result` ni `clientName` sans preuve ou sans accord.
-- Tant qu'aucun projet n'est publié, la section affiche « Nos réalisations sont en cours de documentation » et un bouton de contact.
-
-Les filtres par catégorie apparaissent automatiquement dès que deux catégories ont des projets publiés.
+Les réalisations ne se gèrent plus dans le code : connectez-vous sur le site et utilisez les boutons « + Ajouter ». Voir la [section 5 bis](#5-bis-espace-admin--gérer-vos-réalisations).
 
 ### Modifier un pilier
 
@@ -158,6 +133,60 @@ En local, copiez `.env.example` en `.env.local` si besoin.
 
 ---
 
+## 5 bis. Espace admin : gérer vos réalisations
+
+Vous ajoutez, modifiez et supprimez vos travaux **directement depuis le site**, sans toucher au code.
+
+### Au quotidien
+
+1. Allez sur **`/connexion`** (par exemple `https://votre-domaine.com/connexion`) et saisissez votre mot de passe.
+2. Une **barre « Mode admin »** apparaît en bas de l'écran, sur tout le site. Les galeries affichent des boutons **« + Ajouter un travail »**, et chaque carte un bouton **« Modifier »**. Les visiteurs ne voient jamais ces boutons.
+3. Dans le formulaire :
+   - envoyez vos images (jusqu'à 12, 10 Mo maximum chacune) ; la première sert de couverture ;
+   - choisissez le **pôle** (Brand, Visibility ou Growth) et le **cadre** (client AiTech, poste salarié, projet personnel, formation) ;
+   - décrivez le besoin, la solution et, seulement s'il est documenté, le résultat.
+4. **Publier** rend le travail visible immédiatement dans la galerie de l'accueil, sur la page `/realisations` et sur la page du pôle concerné. Décochez la case pour garder un **brouillon**, visible uniquement dans `/admin`.
+5. **`/admin`** (bouton « Mes travaux ») liste tous vos travaux, brouillons compris, avec les actions Modifier et Supprimer.
+
+Chaque réalisation a un lien partageable, par exemple `/realisations#projet-identite-cabinet-x`, qui ouvre directement sa fiche.
+
+### Mise en service (une seule fois, sur Vercel)
+
+L'espace admin a besoin de deux services gratuits de Vercel et de deux variables secrètes.
+
+1. **Base de données** : dans votre projet Vercel, **Storage → Create Database → Neon (Postgres)**, puis reliez-la au projet. Vercel ajoute automatiquement `DATABASE_URL`. La table est créée toute seule lors du premier ajout.
+2. **Stockage des images** : **Storage → Create → Blob**, puis reliez-le au projet. Vercel ajoute automatiquement `BLOB_READ_WRITE_TOKEN`.
+3. **Settings → Environment Variables**, ajoutez :
+   - `ADMIN_PASSWORD` : votre mot de passe (long et unique, que vous n'utilisez nulle part ailleurs) ;
+   - `SESSION_SECRET` : une chaîne aléatoire d'au moins 32 caractères. Pour en générer une :
+
+     ```bash
+     node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
+     ```
+4. **Redéployez** (Deployments → ⋯ → Redeploy), pour que les nouvelles variables soient prises en compte.
+
+La page `/admin` affiche une liste de contrôle tant qu'un de ces éléments manque.
+
+### En local
+
+Copiez `.env.example` en `.env.local` et renseignez les mêmes variables. Le plus simple, une fois le projet relié à Vercel :
+
+```bash
+npx vercel env pull .env.local
+```
+
+Sans `DATABASE_URL` ni `BLOB_READ_WRITE_TOKEN`, le site fonctionne : la galerie affiche son état vide, et l'admin indique ce qui manque.
+
+### Sécurité
+
+- Le mot de passe n'est jamais stocké dans le code. La session est un cookie signé (`httpOnly`, valable 7 jours), impossible à fabriquer sans `SESSION_SECRET`.
+- Chaque action (ajout, modification, suppression, envoi d'image) revérifie la session côté serveur. Les boutons masqués ne sont qu'un confort d'affichage.
+- Seules les images envoyées sur le stockage du site sont acceptées (JPEG, PNG, WebP, AVIF, GIF, 10 Mo maximum).
+- `/admin`, `/connexion` et `/api` sont exclus des moteurs de recherche.
+- Pour changer de mot de passe : modifiez `ADMIN_PASSWORD` dans Vercel et redéployez. Pour déconnecter toutes les sessions ouvertes, changez aussi `SESSION_SECRET`.
+
+---
+
 ## 6. Architecture du projet
 
 ```
@@ -167,6 +196,10 @@ src/
 │   ├── page.tsx                # Landing : assemblage des sections + données structurées
 │   ├── solutions/[slug]/       # 3 pages piliers générées depuis services.ts
 │   ├── a-propos/               # Présentation du fondateur (données : about.ts)
+│   ├── realisations/           # Galerie complète des réalisations
+│   ├── connexion/              # Connexion admin
+│   ├── admin/                  # Tableau de bord, éditeur et Server Actions (protégés)
+│   ├── api/admin/upload/       # Autorisation d'envoi d'images vers Vercel Blob
 │   ├── not-found.tsx           # Page 404
 │   ├── sitemap.ts · robots.ts  # Générés automatiquement
 │   ├── opengraph-image.tsx     # Image de partage 1200×630 générée au build
@@ -174,18 +207,22 @@ src/
 │   └── globals.css             # Design tokens (palette, polices) + animations
 ├── components/
 │   ├── layout/                 # Header (menu mobile <dialog>), Footer, Logo
+│   ├── projects/               # Galerie et fiche détaillée des réalisations
+│   ├── admin/                  # Barre admin, connexion, éditeur de réalisation
 │   ├── sections/               # Une section de la landing par fichier
 │   └── ui/                     # Button, Section, Icon, SocialIcon
 ├── data/                       # ➜ Tous les contenus éditables
 ├── lib/
 │   ├── contact.ts              # Validation + construction des liens (testé)
-│   └── contact.test.ts
+│   ├── auth/                   # Session admin signée (testé)
+│   ├── projects/               # Validation (testé) et accès base des réalisations
+│   └── db.ts                   # Connexion Postgres (Neon) et création de la table
 └── types/content.ts            # Types de tous les contenus
 ```
 
 **Choix techniques**
-- **Peu de dépendances** : `next`, `react`, `lucide-react` (icônes) et `zod` (validation). Pas de librairie d'animation : CSS natif uniquement.
-- **Pages statiques** : tout est prérendu au build, ce qui donne un chargement rapide et un hébergement simple.
+- **Peu de dépendances** : `next`, `react`, `lucide-react` (icônes), `zod` (validation), `@vercel/blob` (images) et `@neondatabase/serverless` (base de données). Pas de librairie d'animation : CSS natif uniquement.
+- **Pages statiques** : tout est prérendu au build. La galerie est mise en cache (`'use cache'`, étiquette `projects`) et rafraîchie immédiatement après chaque modification dans l'admin (`updateTag`). Seule la barre admin est calculée à chaque requête, sous `<Suspense>`.
 - **Apparitions au défilement** en CSS pur (`animation-timeline: view()`). Les navigateurs qui ne le supportent pas affichent simplement le contenu.
 - **Accessibilité** :
   - HTML sémantique et un seul `h1` par page ;
@@ -214,7 +251,9 @@ Les tests (`src/lib/contact.test.ts`) couvrent :
 - la validation du formulaire ;
 - la normalisation du numéro WhatsApp ;
 - la construction des liens `wa.me` et `mailto:` ;
-- le contenu du message.
+- le contenu du message ;
+- la session admin (signature, expiration, falsification) et les redirections après connexion ;
+- la validation des réalisations (images autorisées, champs, année, lien).
 
 ---
 

@@ -4,7 +4,7 @@ export const whySection = {
   eyebrow: "Pourquoi AiTech ?",
   title: "Une vision créative. Une approche stratégique. Des solutions digitales.",
   intro:
-    "AiTech est un studio indépendant et agile. Vous travaillez avec un interlocuteur unique qui réunit stratégie, création et développement, sans intermédiaire.",
+    "AiTech est un studio indépendant fondé par Ammiel ISSOTINA, designer et développeur web, lauréat Beyotago (Epitech) et CDE Parakou. Vous travaillez avec un interlocuteur unique qui réunit stratégie, création et développement, sans intermédiaire.",
 };
 
 export const advantages: Advantage[] = [

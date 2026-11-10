@@ -40,9 +40,9 @@ export const siteConfig = {
      * Numéro WhatsApp au format international, chiffres uniquement, sans « + » ni espaces.
      * Exemple pour le Bénin : "2290100000000". À COMPLÉTER.
      */
-    whatsapp: "",
+    whatsapp: "2290154377316",
     /** Mention de localisation affichée dans la section contact et le footer. À COMPLÉTER. */
-    location: "",
+    location: "Parakou, Bénin · disponible à distance",
   },
 
   /** Réseaux sociaux. Un lien avec une URL vide n'est pas affiché. */

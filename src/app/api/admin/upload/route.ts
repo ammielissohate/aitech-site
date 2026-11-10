@@ -7,7 +7,7 @@ import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_BYTES } from "@/lib/projects/schema";
  * Autorise l'envoi direct d'images depuis le navigateur vers Vercel Blob.
  *
  * Le navigateur demande d'abord un jeton d'envoi à cette route : il n'est délivré
- * qu'à l'administrateur connecté, pour des images de 10 Mo maximum, rangées dans `realisations/`.
+ * qu'à l'administrateur connecté, pour des images de 10 Mo maximum, rangées dans `realisations/` ou `profil/`.
  * L'image ne transite pas par le serveur du site (pas de limite de taille des fonctions).
  */
 export async function POST(request: Request): Promise<NextResponse> {
@@ -35,7 +35,9 @@ export async function POST(request: Request): Promise<NextResponse> {
           ?.slice(SESSION_COOKIE.length + 1);
 
         if (!isAdminToken(token)) throw new Error("Non autorisé : connectez-vous à l'espace admin.");
-        if (!pathname.startsWith("realisations/")) throw new Error("Emplacement de fichier non autorisé.");
+        if (!pathname.startsWith("realisations/") && !pathname.startsWith("profil/")) {
+          throw new Error("Emplacement de fichier non autorisé.");
+        }
 
         return {
           allowedContentTypes: ALLOWED_IMAGE_TYPES,

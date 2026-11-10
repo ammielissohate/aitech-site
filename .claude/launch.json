@@ -12,6 +12,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "start", "--", "-p", "3001"],
       "port": 3001
+    },
+    {
+      "name": "rendo",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "C:/Users/USER/Desktop/rendo", "run", "start"],
+      "port": 3100
     }
   ]
 }

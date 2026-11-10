@@ -4,8 +4,8 @@ export const heroContent = {
   titleLines: ["Votre image mérite mieux.", "Votre croissance aussi."],
   subtitle:
     "Nous aidons les entreprises à construire une image forte, développer leur visibilité et transformer leur présence digitale en opportunités commerciales.",
-  primaryCta: { label: "Parlons de votre projet", href: "#contact" },
-  secondaryCta: { label: "Découvrir nos solutions", href: "#solutions" },
+  primaryCta: { label: "Obtenir mon devis", href: "#offres" },
+  secondaryCta: { label: "Voir nos réalisations", href: "#realisations" },
   /** Rappel discret des trois piliers sous les boutons. */
   pillarsLine: ["Brand", "Visibility", "Growth"],
 };

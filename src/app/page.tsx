@@ -2,6 +2,7 @@ import { Contact } from "@/components/sections/Contact";
 import { FinalCta } from "@/components/sections/FinalCta";
 import { Hero } from "@/components/sections/Hero";
 import { Method } from "@/components/sections/Method";
+import { Offers } from "@/components/sections/Offers";
 import { Problems } from "@/components/sections/Problems";
 import { Projects } from "@/components/sections/Projects";
 import { Solutions } from "@/components/sections/Solutions";
@@ -42,6 +43,7 @@ export default function HomePage() {
       <Solutions />
       <Method />
       <Projects />
+      <Offers />
       <WhyAitech />
       <FinalCta />
       <Contact />

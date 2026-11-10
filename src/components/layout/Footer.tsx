@@ -14,7 +14,7 @@ export function Footer() {
   const whatsappDigits = normalizeWhatsAppNumber(whatsapp);
 
   return (
-    <footer className="border-t border-line bg-ink">
+    <footer className="border-t border-line bg-ink print:hidden">
       <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 sm:px-8 md:grid-cols-12">
         <div className="md:col-span-5">
           <Logo />

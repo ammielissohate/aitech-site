@@ -15,6 +15,7 @@ Landing page orientée conversion et trois pages « solutions », construites av
 4. [Le formulaire de contact](#4-le-formulaire-de-contact)
 5. [Déployer sur Vercel](#5-déployer-sur-vercel)
 5 bis. [Espace admin : gérer vos réalisations](#5-bis-espace-admin--gérer-vos-réalisations)
+5 ter. [Offres, devis et rendez-vous](#5-ter-offres-devis-et-rendez-vous)
 6. [Architecture du projet](#6-architecture-du-projet)
 7. [Qualité : lint, types, tests, build](#7-qualité--lint-types-tests-build)
 8. [Notes techniques et limites connues](#8-notes-techniques-et-limites-connues)
@@ -75,14 +76,12 @@ Chaque section de la page lit ses textes dans un fichier de `src/data/` :
 | `projects.ts`      | Textes de la galerie (les réalisations elles-mêmes s'ajoutent depuis le site) |
 | `advantages.ts`    | Section « Pourquoi AiTech ? »                                               |
 | `contact.ts`       | Textes et messages du formulaire                                            |
-| `about.ts`         | Page « À propos » : présentation du fondateur, photo, compétences par pilier |
+| `about.ts`         | Page « À propos » : parcours, distinctions, formations (la photo se change dans l'admin) |
+| `offers.ts`        | **Offres et prix** par zone (FCFA, €, $), délais, contenu de chaque pack     |
 
-### Ajouter votre photo (page À propos)
+### Changer votre photo (page À propos)
 
-1. Déposez votre photo dans `public/images/`, par exemple `fondateur.jpg` (format portrait, idéalement 1200 × 1500 px).
-2. Dans `src/data/about.ts`, renseignez `name`, puis décommentez la ligne `photo` et ajustez `src` et `alt`.
-
-Sans photo, la page affiche un monogramme « Ai ». En développement, une étiquette « Photo à ajouter » s'y ajoute.
+Connectez-vous, puis **barre admin → Paramètres → Choisir une photo → Enregistrer**. Un bouton « Changer la photo » apparaît aussi sur la page À propos quand vous êtes connecté.
 
 ### Ajouter une réalisation
 
@@ -187,6 +186,50 @@ Sans `DATABASE_URL` ni `BLOB_READ_WRITE_TOKEN`, le site fonctionne : la galerie 
 
 ---
 
+## 5 ter. Offres, devis et rendez-vous
+
+### Le parcours du visiteur
+
+1. Il voit les offres (accueil, section « Nos offres », et page `/offres`) avec des **prix adaptés à sa région** :
+   - **Afrique** → FCFA (+ équivalent en euros, taux fixe 655,957) ;
+   - **Europe** → euros ;
+   - **International** (Amériques, Asie…) → dollars US.
+   La région est détectée par Vercel à partir du pays du visiteur ; le prix est **recalculé côté serveur** au moment du devis (impossible à modifier depuis le navigateur).
+2. « **Obtenir mon devis** » → `/devis` en 3 étapes : offre (et quantité), coordonnées (particulier ou entreprise), **créneau d'appel**.
+3. Il reçoit immédiatement son devis (`/devis/recu`), imprimable en PDF, avec ajout à Google Agenda ou à tout calendrier (.ics). Le lien contient une clé secrète : seul le client (et vous) peut l'ouvrir.
+4. Vous recevez un **e-mail** (si Resend est configuré) et la demande apparaît dans **Admin → Demandes**.
+
+### Modifier les prix ou les offres
+
+Tout est dans `src/data/offers.ts` : nom, promesse, contenu, délai et `prices: { africa, europe, international }`. Une « économie » n'est affichée que si un pack est réellement moins cher que l'unité (`savings`).
+
+### Créneaux d'appel
+
+Définis dans `src/lib/booking.ts` (heure du Bénin, UTC+1) :
+- du lundi au vendredi : 6 h 00, 10 h 00, 12 h 30, 21 h 00, 22 h 30 ;
+- le samedi : 6 h 00, 10 h 00, 12 h 30 (rien après 13 h) ;
+- le dimanche : aucun appel.
+
+Réservation possible sur 14 jours, au moins 12 h à l'avance. Un créneau réservé disparaît pour les autres visiteurs (la base de données refuse toute double réservation). Passer une demande au statut **Annulé** libère son créneau.
+
+### Suivre les demandes
+
+**Admin → Demandes** : appels à venir et historique, liens directs WhatsApp et e-mail, devis du client, et statut (Nouveau, Appel confirmé, Contrat signé, Non abouti, Annulé).
+
+### Activer les e-mails de notification (Resend)
+
+1. Créez un compte gratuit sur [resend.com](https://resend.com) avec l'adresse qui doit recevoir les notifications.
+2. **API Keys → Create API Key** (permission « Sending access »).
+3. Dans Vercel, ajoutez les variables `RESEND_API_KEY` (la clé) et `QUOTE_NOTIFY_EMAIL` (l'adresse de votre compte Resend), puis redéployez.
+
+Avec l'expéditeur par défaut (`onboarding@resend.dev`), Resend n'envoie qu'à l'adresse de votre compte : c'est suffisant pour vous notifier. Pour envoyer depuis votre propre domaine, vérifiez-le sur Resend et définissez `RESEND_FROM`.
+
+### Tester une autre région en local
+
+Ajoutez `DEV_COUNTRY=FR` (ou `US`, `BJ`…) dans `.env.local`, puis rechargez la page.
+
+---
+
 ## 6. Architecture du projet
 
 ```
@@ -196,9 +239,11 @@ src/
 │   ├── page.tsx                # Landing : assemblage des sections + données structurées
 │   ├── solutions/[slug]/       # 3 pages piliers générées depuis services.ts
 │   ├── a-propos/               # Présentation du fondateur (données : about.ts)
+│   ├── offres/                 # Toutes les offres et leurs prix
+│   ├── devis/                  # Parcours de devis, Server Action, page du devis (recu/)
 │   ├── realisations/           # Galerie complète des réalisations
 │   ├── connexion/              # Connexion admin
-│   ├── admin/                  # Tableau de bord, éditeur et Server Actions (protégés)
+│   ├── admin/                  # Travaux, demandes, paramètres, éditeur et Server Actions (protégés)
 │   ├── api/admin/upload/       # Autorisation d'envoi d'images vers Vercel Blob
 │   ├── not-found.tsx           # Page 404
 │   ├── sitemap.ts · robots.ts  # Générés automatiquement
@@ -216,7 +261,10 @@ src/
 │   ├── contact.ts              # Validation + construction des liens (testé)
 │   ├── auth/                   # Session admin signée (testé)
 │   ├── projects/               # Validation (testé) et accès base des réalisations
-│   └── db.ts                   # Connexion Postgres (Neon) et création de la table
+│   ├── pricing.ts · booking.ts # Zones de prix, devises, créneaux d'appel (testés)
+│   ├── quotes/                 # Validation (testée) et enregistrement des devis
+│   ├── notify.ts · settings.ts # E-mail Resend, paramètres (photo)
+│   └── db.ts                   # Connexion Postgres (Neon) et création des tables
 └── types/content.ts            # Types de tous les contenus
 ```
 
@@ -253,7 +301,12 @@ Les tests (`src/lib/contact.test.ts`) couvrent :
 - la construction des liens `wa.me` et `mailto:` ;
 - le contenu du message ;
 - la session admin (signature, expiration, falsification) et les redirections après connexion ;
-- la validation des réalisations (images autorisées, champs, année, lien).
+- la validation des réalisations (images autorisées, champs, année, lien) ;
+- les zones de prix, devises et économies de packs ;
+- les créneaux d'appel (préavis, samedi, dimanche, créneaux réservés) ;
+- la validation et le calcul des devis (prix recalculé, quantités, anti-robots).
+
+`npm run db:setup` crée ou met à jour les tables (réalisations, devis, paramètres) dans la base pointée par `DATABASE_URL`.
 
 ---
 

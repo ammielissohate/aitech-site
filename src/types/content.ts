@@ -89,17 +89,24 @@ export interface Advantage {
   icon: IconKey;
 }
 
-/** Présentation du fondateur (page /a-propos). */
+/** Présentation du fondateur (page /a-propos). La photo se gère depuis l'admin (/admin/parametres). */
 export interface Founder {
-  /** Laisser vide tant que non renseigné : la page affiche alors « Fondateur de AiTech ». */
   name: string;
   role: string;
-  /** Photo dans `public/images/`. Sans photo, un monogramme AiTech est affiché. */
-  photo?: { src: string; alt: string; width: number; height: number };
+  location: string;
   /** Phrase d'accroche sous le titre. */
   intro: string;
-  /** Quelques paragraphes courts : parcours et vision. Pas un CV. */
+  /** Quelques paragraphes courts : parcours et vision. */
   story: string[];
+  /** Chiffres et faits vérifiables mis en avant. */
+  highlights: { value: string; label: string }[];
+  /** Prix, concours, bourses et sélections. */
+  distinctions: { year: string; title: string; organization: string; detail: string; kind: "prix" | "bourse" | "selection" }[];
+  /** Expériences professionnelles, de la plus récente à la plus ancienne. */
+  experiences: { role: string; organization: string; period: string; points: string[] }[];
+  /** Diplômes et formations certifiantes. */
+  education: { title: string; organization: string; period: string; detail?: string }[];
+  languages: { name: string; level: string }[];
   /** Compétences regroupées par pilier : elles servent les offres, elles n'en sont pas. */
   expertiseByPillar: { pillar: PillarSlug; title: string; skills: string[] }[];
   /** Outils utilisés au quotidien (moyens, pas prestations). */

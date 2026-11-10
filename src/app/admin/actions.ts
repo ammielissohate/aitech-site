@@ -13,7 +13,10 @@ import {
   PROJECTS_CACHE_TAG,
   updateProject,
 } from "@/lib/projects/repository";
-import { projectInputFromFormData, validateProjectInput, type ProjectFieldErrors } from "@/lib/projects/schema";
+import { isBlobImageUrl, projectInputFromFormData, validateProjectInput, type ProjectFieldErrors } from "@/lib/projects/schema";
+import { updateQuoteStatus } from "@/lib/quotes/repository";
+import { QUOTE_STATUSES, type QuoteStatus } from "@/lib/quotes/schema";
+import { getFounderPhoto, setFounderPhoto, SETTINGS_CACHE_TAG } from "@/lib/settings";
 import type { ProjectImage } from "@/types/content";
 
 /**
@@ -116,4 +119,50 @@ export async function deleteProjectAction(formData: FormData): Promise<void> {
   await deleteImagesQuietly(images);
   updateTag(PROJECTS_CACHE_TAG);
   redirect("/admin");
+}
+
+/* ─── Demandes de devis ─── */
+
+export async function updateQuoteStatusAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const id = formData.get("id");
+  const status = formData.get("status");
+  if (typeof id !== "string" || !(QUOTE_STATUSES as readonly unknown[]).includes(status)) return;
+  // Une demande annulée libère son créneau d'appel (index unique partiel en base).
+  await updateQuoteStatus(id, status as QuoteStatus);
+  redirect("/admin/demandes");
+}
+
+/* ─── Paramètres : photo de profil ─── */
+
+export interface SettingsState {
+  error?: string;
+  saved?: boolean;
+}
+
+export async function saveFounderPhotoAction(_previous: SettingsState, formData: FormData): Promise<SettingsState> {
+  await requireAdmin();
+  if (!isDatabaseConfigured()) return { error: "La base de données n'est pas configurée." };
+
+  const remove = formData.get("remove") === "1";
+  const previous = await getFounderPhoto();
+
+  if (remove) {
+    await setFounderPhoto(null);
+  } else {
+    const url = formData.get("url");
+    const width = Number(formData.get("width"));
+    const height = Number(formData.get("height"));
+    if (typeof url !== "string" || !isBlobImageUrl(url) || !Number.isInteger(width) || !Number.isInteger(height) || width <= 0 || height <= 0) {
+      return { error: "Image invalide : envoyez-la depuis ce formulaire." };
+    }
+    await setFounderPhoto({ url, width, height });
+  }
+
+  // L'ancienne photo n'est plus utilisée : on la retire du stockage.
+  if (previous && (remove || previous.url !== formData.get("url"))) {
+    await deleteImagesQuietly([{ ...previous, alt: "" }]);
+  }
+  updateTag(SETTINGS_CACHE_TAG);
+  return { saved: true };
 }

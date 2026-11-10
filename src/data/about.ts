@@ -1,67 +1,177 @@
 import type { Founder } from "@/types/content";
 
 /**
- * Page « À propos » : présentation du fondateur de AiTech.
+ * Page « À propos » : présentation du fondateur, à partir de son CV.
  *
- * ➜ À COMPLÉTER / RELIRE :
- *  - `name` : votre nom tel que vous souhaitez l'afficher.
- *  - `photo` : déposez votre photo dans `public/images/` (format portrait, idéalement 1200 × 1500 px)
- *    puis décommentez la ligne `photo`.
- *  - `story` : les paragraphes ci-dessous sont une première proposition rédigée à partir
- *    de votre profil. Relisez-les et ajustez-les avec vos mots et votre parcours réel.
+ * ➜ La PHOTO se change depuis le site : Admin → Paramètres (aucun code à modifier).
+ * ➜ Pour ajouter une distinction ou une expérience : ajoutez une ligne dans la liste concernée.
  *
- * Règle éditoriale : le visiteur doit comprendre ce que vous apportez à son projet,
- * pas lire un CV complet. Les loisirs et activités personnelles n'ont pas leur place ici.
+ * Règle : uniquement des faits vérifiables. Les organisations citées sont des employeurs,
+ * des programmes ou des partenaires du parcours personnel : elles ne sont pas présentées comme clientes d'AiTech.
  */
 export const aboutSection = {
   eyebrow: "À propos",
-  title: "Une seule personne derrière la stratégie, le design et le code.",
+  title: "Designer, développeur, lauréat. Et surtout, à votre écoute.",
   seo: {
-    title: "À propos du fondateur",
+    title: "Ammiel ISSOTINA, fondateur d'AiTech",
     description:
-      "Découvrez le fondateur de AiTech, studio de croissance digitale : un profil qui réunit stratégie, design, contenu et développement web.",
+      "Designer graphique, UI/UX designer et développeur web basé à Parakou (Bénin), lauréat Beyotago (Epitech) et CDE Parakou. Fondateur du studio AiTech.",
   },
+  storyTitle: "Pourquoi AiTech existe",
+  distinctionsTitle: "Distinctions & sélections",
+  distinctionsIntro: "Des projets numériques reconnus par des jurys, des écoles et des communautés tech.",
+  experienceTitle: "Parcours professionnel",
+  educationTitle: "Formation",
   expertiseTitle: "Ce que j'apporte à chaque levier",
   expertiseIntro:
     "Mes compétences ne sont pas des offres séparées : elles se combinent pour servir l'image, la visibilité et la croissance de votre entreprise.",
   toolsTitle: "Outils du quotidien",
+  languagesTitle: "Langues",
   principlesTitle: "Ma façon de travailler",
-  cta: { label: "Parlons de votre projet", href: "/#contact" },
+  cta: { label: "Obtenir mon devis", href: "/offres" },
 };
 
 export const founder: Founder = {
-  name: "", // À COMPLÉTER, par exemple "Prénom Nom"
-  role: "Fondateur de AiTech",
-  // photo: { src: "/images/fondateur.jpg", alt: "Portrait de Prénom Nom, fondateur de AiTech", width: 1200, height: 1500 },
+  name: "Ammiel ISSOTINA",
+  role: "Fondateur d'AiTech · Designer & développeur web",
+  location: "Parakou, Bénin",
   intro:
-    "J'ai créé AiTech pour aider les entreprises à mieux se présenter, mieux communiquer et transformer leur présence digitale en opportunités commerciales.",
+    "Je crée des marques, des contenus et des sites qui donnent aux entreprises l'image qu'elles méritent, et les clients qui vont avec.",
   story: [
-    "Mon parcours m'a fait passer par le développement web, le design graphique, l'UI/UX, la création de contenu et l'audiovisuel. Ce profil polyvalent m'a appris une chose : une belle image ne suffit pas si personne ne la voit, et une forte visibilité ne sert à rien si elle ne mène pas à une prise de contact.",
-    "C'est pour cela qu'AiTech relie trois leviers : construire une marque crédible, la rendre visible auprès des bonnes personnes, puis faciliter le passage de l'intérêt à la demande commerciale.",
-    "Je travaille avec des entrepreneurs, des PME et des professionnels au Bénin, en Afrique francophone et à l'international, avec une approche simple : comprendre votre activité avant de proposer quoi que ce soit.",
+    "Depuis 2022, j'accompagne particuliers et entreprises en freelance : identités visuelles, maquettes de sites et d'applications, contenus pour les réseaux sociaux. J'ai aussi été graphiste officiel et community manager pour des événements, des artistes et des structures au Bénin.",
+    "Formé en sciences informatiques, passé par Epitech et plusieurs programmes tech, je relie ce que beaucoup séparent : le design qui attire, la communication qui engage et le code qui convertit.",
+    "J'ai créé AiTech pour offrir aux entrepreneurs d'Afrique et d'ailleurs un studio où l'on écoute avant de produire, où les prix sont clairs, et où chaque création sert un objectif concret : être reconnu, être vu, être choisi.",
+  ],
+  highlights: [
+    { value: "Depuis 2022", label: "en freelance auprès de particuliers et d'entreprises" },
+    { value: "3 fois lauréat", label: "de concours de projets numériques (dont 2 premières places)" },
+    { value: "4 langues", label: "français, anglais, dendi et lokpa" },
+  ],
+  distinctions: [
+    {
+      year: "2024",
+      title: "Lauréat · 1re place",
+      organization: "CDE Parakou · programme Hub Innovation",
+      detail: "Plateforme de suivi des alumni.",
+      kind: "prix",
+    },
+    {
+      year: "2022",
+      title: "Lauréat · 1re place",
+      organization: "Beyotago, programme initié par Epitech",
+      detail: "Projet numérique de recyclage et de transformation des déchets.",
+      kind: "prix",
+    },
+    {
+      year: "2020",
+      title: "Lauréat · 3e place",
+      organization: "Beyotago, programme initié par Epitech",
+      detail: "Bourse obtenue en équipe pour un projet dans le domaine du numérique.",
+      kind: "prix",
+    },
+    {
+      year: "Bourse",
+      title: "Boursier Data Scientist",
+      organization: "Isheero, communauté de l'IA au Bénin",
+      detail: "Parcours data science et atelier pratique en IA (RAG, LLM) avec Indaba Bénin.",
+      kind: "bourse",
+    },
+    {
+      year: "Bourse",
+      title: "Boursier",
+      organization: "Ideation Hub Africa",
+      detail: "Programme d'accompagnement à l'innovation.",
+      kind: "bourse",
+    },
+    {
+      year: "Sélection",
+      title: "Créateur de contenu engagé",
+      organization: "SOS Civisme Bénin et partenaires internationaux",
+      detail: "Sélectionné pour sensibiliser aux violences basées sur le genre (VBG).",
+      kind: "selection",
+    },
+    // À COMPLÉTER : distinction 2025 (programme, place, projet), puis retirer ce commentaire.
+  ],
+  experiences: [
+    {
+      role: "Graphiste & Community Manager",
+      organization: "Freelance",
+      period: "Depuis septembre 2022",
+      points: [
+        "Identités visuelles pour particuliers et entreprises : logos, chartes, supports marketing",
+        "Maquettes de sites web et d'applications",
+        "Gestion de réseaux sociaux : stratégie, carrousels, infographies, animations, modération",
+      ],
+    },
+    {
+      role: "Graphiste",
+      organization: "Altis Strategy",
+      period: "Juin 2026",
+      points: ["Brochures de présentation des services", "Kakémonos pour les événements"],
+    },
+    {
+      role: "Graphiste",
+      organization: "Warrior Voice",
+      period: "Mars 2026",
+      points: ["Supports visuels et contenus graphiques", "Cohérence de l'identité visuelle"],
+    },
+    {
+      role: "Community Manager & graphiste officiel",
+      organization: "Alkaki Awards",
+      period: "Septembre 2025 – février 2026",
+      points: ["Création et gestion des contenus", "Designs et vidéos promotionnelles", "Stratégie digitale de portée et d'engagement"],
+    },
+    {
+      role: "Community Manager",
+      organization: "Jacob Nikki Songs",
+      period: "Décembre 2024 – décembre 2025",
+      points: ["Animation Facebook, TikTok et YouTube", "Visuels et vidéos pour les sorties musicales"],
+    },
+    {
+      role: "Graphiste officiel",
+      organization: "Le Soir de la Pentecôte 2024, Parakou",
+      period: "Décembre 2023 – juin 2024",
+      points: ["Affiches, teasers et campagnes visuelles de l'événement"],
+    },
+    {
+      role: "Community Manager & Designer",
+      organization: "Future is Us",
+      period: "Décembre 2023 – juin 2024",
+      points: ["Visuels et animation des pages Facebook et Instagram", "Stratégies d'engagement de la communauté"],
+    },
+  ],
+  education: [
+    { title: "Licence en science informatique et logiciel", organization: "Université Les Cours Sonou", period: "2021 – 2024" },
+    { title: "Développement web, hackathon", organization: "Epitech", period: "2022 – 2023" },
+    { title: "Introduction à Python, bases de données", organization: "Bourse Data Camp", period: "2026" },
+    { title: "Atelier pratique en IA (RAG, LLM)", organization: "Indaba Bénin × Isheero", period: "2026" },
+    { title: "Marketing digital, rédaction web", organization: "Jkoss Media", period: "2023" },
+    { title: "Marketing digital, Canva, prompting IA", organization: "Blemama.com", period: "2023" },
+  ],
+  languages: [
+    { name: "Français", level: "Langue maternelle" },
+    { name: "Lokpa", level: "Langue maternelle" },
+    { name: "Anglais", level: "Courant" },
+    { name: "Dendi", level: "Courant" },
   ],
   expertiseByPillar: [
     {
       pillar: "brand-positioning",
       title: "Brand & Positioning",
-      skills: ["Identité visuelle et design graphique", "Direction artistique", "UI/UX design"],
+      skills: ["Identité visuelle et branding", "Direction artistique", "Supports print : brochures, kakémonos, affiches"],
     },
     {
       pillar: "content-visibility",
       title: "Content & Visibility",
-      skills: ["Stratégie de contenu et storytelling", "Community management", "Montage vidéo et production de contenus"],
+      skills: ["Stratégie de contenu et community management", "Carrousels, infographies et motion design", "Analyse des performances (Facebook, Instagram, LinkedIn)"],
     },
     {
       pillar: "digital-growth",
       title: "Digital Growth & Acquisition",
-      skills: [
-        "Conception de sites web et landing pages",
-        "Développement front-end (HTML, CSS, JavaScript)",
-        "Python et Django, en cours d'approfondissement",
-      ],
+      skills: ["UI/UX design de sites et d'applications", "Développement front-end (HTML, CSS, JavaScript)", "Python, données et IA appliquée"],
     },
   ],
-  tools: ["Figma", "Lunacy", "Adobe", "Canva", "Outils d'intelligence artificielle"],
+  tools: ["Figma", "Adobe Photoshop", "Adobe Illustrator", "Adobe XD", "Canva", "Outils d'intelligence artificielle"],
   principles: [
     {
       title: "Comprendre avant de produire",
@@ -69,11 +179,11 @@ export const founder: Founder = {
     },
     {
       title: "Dire les choses clairement",
-      description: "Des étapes, des livrables et des délais définis à l'avance. Pas de promesse de résultats garantis.",
+      description: "Des prix affichés, des délais annoncés et des livrables définis à l'avance.",
     },
     {
-      title: "Utiliser la technologie avec discernement",
-      description: "L'IA et les outils numériques accélèrent la production ; la stratégie et les choix restent humains.",
+      title: "Respecter les délais",
+      description: "Une habitude prise sur des événements où la date ne se négocie pas.",
     },
   ],
 };

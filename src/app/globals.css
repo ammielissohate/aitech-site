@@ -227,3 +227,18 @@ dialog.mobile-menu::backdrop {
   background: rgb(9 9 15 / 0.7);
   backdrop-filter: blur(4px);
 }
+
+/* ─── Impression (devis en PDF) ─── */
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    color: #09090f;
+  }
+  html[data-admin] body {
+    padding-bottom: 0;
+  }
+  @page {
+    margin: 16mm;
+  }
+}

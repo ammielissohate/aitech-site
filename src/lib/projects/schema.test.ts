@@ -45,7 +45,17 @@ describe("validation d'une réalisation", () => {
   it("exige au moins une image", () => {
     const result = validateProjectInput(projectInputFromFormData(formWith({ images: "[]" })));
     expect(result.success).toBe(false);
-    if (!result.success) expect(result.errors.images).toMatch(/au moins une image/);
+    if (!result.success) expect(result.errors.images).toMatch(/au moins une image ou une vidéo/);
+  });
+
+  it("accepte une vidéo avec sa couverture, et refuse une couverture externe", () => {
+    const video = { ...image, url: image.url.replace(".png", ".mp4"), kind: "video", poster: image.url };
+    const ok = validateProjectInput(projectInputFromFormData(formWith({ images: JSON.stringify([video]) })));
+    expect(ok.success).toBe(true);
+    const bad = validateProjectInput(
+      projectInputFromFormData(formWith({ images: JSON.stringify([{ ...video, poster: "https://exemple.com/c.webp" }]) })),
+    );
+    expect(bad.success).toBe(false);
   });
 
   it("refuse une image qui ne vient pas du stockage du site", () => {

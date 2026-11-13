@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Images, Pencil, Plus } from "lucide-react";
+import { Images, Pencil, Play, Plus } from "lucide-react";
 import { useState, useSyncExternalStore } from "react";
 import { projectContextLabels, projectsSection } from "@/data/projects";
 import { pillars } from "@/data/services";
 import { cn } from "@/lib/cn";
+import { isVideo, previewSrc } from "@/lib/media";
 import type { PillarSlug, Project } from "@/types/content";
 import { ProjectLightbox } from "./ProjectLightbox";
 
@@ -120,6 +121,8 @@ export function ProjectGallery({ projects, withFilters = false, pillar, limit, t
 
 function ProjectCard({ project, isLight, onOpen }: { project: Project; isLight: boolean; onOpen: () => void }) {
   const cover = project.images[0];
+  const coverSrc = previewSrc(cover);
+  const hasVideo = project.images.some(isVideo);
   const pillar = pillars.find((item) => item.slug === project.pillar);
 
   return (
@@ -133,15 +136,22 @@ function ProjectCard({ project, isLight, onOpen }: { project: Project; isLight: 
       )}
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-ink-2 to-brand-deep">
-        {cover && (
+        {cover && coverSrc && (
           <Image
-            src={cover.url}
+            src={coverSrc}
             alt={cover.alt || project.title}
             width={cover.width}
             height={cover.height}
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             className="size-full object-cover transition duration-700 group-hover:scale-[1.04]"
           />
+        )}
+        {hasVideo && (
+          <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center">
+            <span className="glass inline-flex size-14 items-center justify-center rounded-full border border-white/30 transition duration-300 group-hover:scale-110">
+              <Play className="ml-0.5 size-6 fill-white text-white" />
+            </span>
+          </span>
         )}
         {project.images.length > 1 && (
           <span className="glass absolute right-3 bottom-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs text-white">

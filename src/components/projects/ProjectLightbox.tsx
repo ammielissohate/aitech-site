@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, ChevronLeft, ChevronRight, Pencil, X } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Pencil, Play, X } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { projectContextLabels } from "@/data/projects";
 import { pillars } from "@/data/services";
 import { cn } from "@/lib/cn";
+import { isVideo, previewSrc } from "@/lib/media";
 import type { Project } from "@/types/content";
 
 interface ProjectLightboxProps {
@@ -54,7 +55,8 @@ export function ProjectLightbox({ project, onClose }: ProjectLightboxProps) {
       onClose={onClose}
       onClick={(event) => event.target === event.currentTarget && dialogRef.current?.close()}
       onKeyDown={(event) => {
-        if (!hasMany) return;
+        // Les flèches servent à avancer dans la vidéo quand elle a le focus.
+        if (!hasMany || event.target instanceof HTMLVideoElement) return;
         if (event.key === "ArrowRight") goTo(imageIndex + 1);
         if (event.key === "ArrowLeft") goTo(imageIndex - 1);
       }}
@@ -64,7 +66,19 @@ export function ProjectLightbox({ project, onClose }: ProjectLightboxProps) {
         {/* Images */}
         <div className="relative flex flex-col bg-ink lg:max-h-[92dvh]">
           <div className="relative flex min-h-64 flex-1 items-center justify-center p-3 sm:p-5">
-            {current && (
+            {current && isVideo(current) && (
+              <video
+                key={current.url}
+                src={current.url}
+                poster={current.poster}
+                controls
+                playsInline
+                preload="metadata"
+                aria-label={current.alt || project.title}
+                className="max-h-[60dvh] w-auto max-w-full rounded-xl bg-black lg:max-h-[78dvh]"
+              />
+            )}
+            {current && !isVideo(current) && (
               <Image
                 key={current.url}
                 src={current.url}
@@ -110,8 +124,19 @@ export function ProjectLightbox({ project, onClose }: ProjectLightboxProps) {
                     index === imageIndex ? "border-brand-3" : "border-transparent opacity-60 hover:opacity-100",
                   )}
                 >
-                  <Image src={image.url} alt="" fill sizes="64px" className="object-cover" />
-                  <span className="sr-only">Afficher l&apos;image {index + 1}</span>
+                  {previewSrc(image) ? (
+                    <Image src={previewSrc(image)!} alt="" fill sizes="64px" className="object-cover" />
+                  ) : (
+                    <span className="flex size-full items-center justify-center bg-ink-3" />
+                  )}
+                  {isVideo(image) && (
+                    <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center bg-black/30">
+                      <Play className="size-5 fill-white text-white" />
+                    </span>
+                  )}
+                  <span className="sr-only">
+                    Afficher {isVideo(image) ? "la vidéo" : "l'image"} {index + 1}
+                  </span>
                 </button>
               ))}
             </div>

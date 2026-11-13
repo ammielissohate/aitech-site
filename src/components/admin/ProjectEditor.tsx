@@ -2,14 +2,23 @@
 
 import Image from "next/image";
 import { upload } from "@vercel/blob/client";
-import { AlertCircle, ArrowDown, ArrowUp, ImagePlus, Loader2, Save, Star, Trash2 } from "lucide-react";
+import { AlertCircle, ArrowDown, ArrowUp, ImagePlus, Loader2, Play, Save, Star, Trash2 } from "lucide-react";
 import { useActionState, useId, useRef, useState, type ReactNode } from "react";
 import { saveProjectAction, type SaveProjectState } from "@/app/admin/actions";
 import { buttonClasses } from "@/components/ui/Button";
 import { projectContextLabels } from "@/data/projects";
 import { pillars } from "@/data/services";
 import { cn } from "@/lib/cn";
-import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_BYTES, MAX_IMAGES, slugify, type ProjectField } from "@/lib/projects/schema";
+import { isVideo, previewSrc } from "@/lib/media";
+import {
+  ALLOWED_IMAGE_TYPES,
+  ALLOWED_VIDEO_TYPES,
+  MAX_IMAGE_BYTES,
+  MAX_IMAGES,
+  MAX_VIDEO_BYTES,
+  slugify,
+  type ProjectField,
+} from "@/lib/projects/schema";
 import type { PillarSlug, Project, ProjectContext, ProjectImage } from "@/types/content";
 
 interface ProjectEditorProps {
@@ -26,10 +35,46 @@ async function readImageSize(file: File): Promise<{ width: number; height: numbe
 }
 
 /**
+ * Lit les dimensions d'une vidéo locale et en extrait une image de couverture (vers 1 s).
+ * Tout se passe dans le navigateur, avant l'envoi.
+ */
+async function readVideoCover(file: File): Promise<{ width: number; height: number; cover: Blob | null }> {
+  const url = URL.createObjectURL(file);
+  try {
+    const video = document.createElement("video");
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = "auto";
+    video.src = url;
+    await new Promise<void>((resolve, reject) => {
+      video.onloadedmetadata = () => resolve();
+      video.onerror = () => reject(new Error("Vidéo illisible par le navigateur."));
+    });
+    const width = video.videoWidth;
+    const height = video.videoHeight;
+    video.currentTime = Math.min(1, (video.duration || 2) / 4);
+    await new Promise<void>((resolve) => {
+      video.onseeked = () => resolve();
+      setTimeout(resolve, 4000); // sécurité si l'évènement n'arrive pas
+    });
+    const canvas = document.createElement("canvas");
+    const scale = Math.min(1, 1600 / Math.max(width, height));
+    canvas.width = Math.round(width * scale);
+    canvas.height = Math.round(height * scale);
+    canvas.getContext("2d")?.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const cover = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", 0.85));
+    return { width, height, cover };
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+/**
  * Formulaire d'ajout / modification d'une réalisation.
  *
- * Les images partent directement du navigateur vers Vercel Blob (route /api/admin/upload,
+ * Les images et vidéos partent directement du navigateur vers Vercel Blob (route /api/admin/upload,
  * réservée à l'admin), puis leurs adresses sont envoyées avec le formulaire.
+ * Pour une vidéo, une image de couverture est générée automatiquement.
  */
 export function ProjectEditor({ project, defaultPillar }: ProjectEditorProps) {
   const [state, formAction, isSaving] = useActionState<SaveProjectState, FormData>(saveProjectAction, {});
@@ -45,27 +90,52 @@ export function ProjectEditor({ project, defaultPillar }: ProjectEditorProps) {
     const files = Array.from(fileList).slice(0, MAX_IMAGES - images.length);
 
     for (const file of files) {
-      if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-        setUploadError(`« ${file.name} » n'est pas une image acceptée (JPEG, PNG, WebP, AVIF ou GIF).`);
+      const video = ALLOWED_VIDEO_TYPES.includes(file.type);
+      if (!video && !ALLOWED_IMAGE_TYPES.includes(file.type)) {
+        setUploadError(`« ${file.name} » n'est pas accepté : images (JPEG, PNG, WebP, AVIF, GIF) ou vidéos (MP4, WebM, MOV).`);
         continue;
       }
-      if (file.size > MAX_IMAGE_BYTES) {
-        setUploadError(`« ${file.name} » dépasse 10 Mo. Compressez-la avant de l'envoyer.`);
+      if (file.size > (video ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES)) {
+        setUploadError(`« ${file.name} » dépasse ${video ? "250" : "10"} Mo. Compressez-le avant de l'envoyer.`);
         continue;
       }
 
       try {
         setUploading({ name: file.name, percentage: 0 });
-        const size = await readImageSize(file);
-        const extension = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
+        const extension = file.name.split(".").pop()?.toLowerCase() ?? (video ? "mp4" : "jpg");
         const baseName = slugify(file.name.replace(/\.[^.]+$/, ""));
-        const blob = await upload(`realisations/${baseName}.${extension}`, file, {
-          access: "public",
-          handleUploadUrl: "/api/admin/upload",
-          contentType: file.type,
-          onUploadProgress: ({ percentage }) => setUploading({ name: file.name, percentage: Math.round(percentage) }),
-        });
-        setImages((current) => [...current, { url: blob.url, ...size, alt: "" }]);
+        const onUploadProgress = ({ percentage }: { percentage: number }) =>
+          setUploading({ name: file.name, percentage: Math.round(percentage) });
+
+        if (video) {
+          const { width, height, cover } = await readVideoCover(file);
+          const blob = await upload(`realisations/${baseName}.${extension}`, file, {
+            access: "public",
+            handleUploadUrl: "/api/admin/upload",
+            contentType: file.type,
+            multipart: file.size > 20 * 1024 * 1024, // envoi en plusieurs morceaux pour les grosses vidéos
+            onUploadProgress,
+          });
+          const poster = cover
+            ? (
+                await upload(`realisations/${baseName}-couverture.webp`, cover, {
+                  access: "public",
+                  handleUploadUrl: "/api/admin/upload",
+                  contentType: "image/webp",
+                })
+              ).url
+            : undefined;
+          setImages((current) => [...current, { url: blob.url, width, height, alt: "", kind: "video", poster }]);
+        } else {
+          const size = await readImageSize(file);
+          const blob = await upload(`realisations/${baseName}.${extension}`, file, {
+            access: "public",
+            handleUploadUrl: "/api/admin/upload",
+            contentType: file.type,
+            onUploadProgress,
+          });
+          setImages((current) => [...current, { url: blob.url, ...size, alt: "" }]);
+        }
       } catch (error) {
         const message = error instanceof Error ? error.message : "Erreur inconnue.";
         setUploadError(`Envoi de « ${file.name} » impossible : ${message}`);
@@ -100,9 +170,10 @@ export function ProjectEditor({ project, defaultPillar }: ProjectEditorProps) {
 
       {/* ── Images ── */}
       <fieldset className="rounded-3xl border border-line bg-ink-2 p-6 sm:p-8">
-        <legend className="px-2 font-display text-lg font-semibold">Images *</legend>
+        <legend className="px-2 font-display text-lg font-semibold">Images et vidéos *</legend>
         <p className="text-sm text-muted">
-          Jusqu&apos;à {MAX_IMAGES} images, 10 Mo maximum chacune. La première sert de couverture : utilisez les flèches pour réordonner.
+          Jusqu&apos;à {MAX_IMAGES} médias : images (10 Mo max.) ou vidéos de motion design (250 Mo max.). Le premier sert de
+          couverture : utilisez les flèches pour réordonner.
         </p>
 
         {images.length > 0 && (
@@ -110,7 +181,12 @@ export function ProjectEditor({ project, defaultPillar }: ProjectEditorProps) {
             {images.map((image, index) => (
               <li key={image.url} className="flex flex-col gap-4 rounded-2xl border border-line bg-ink p-3 sm:flex-row sm:items-center">
                 <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden rounded-xl bg-ink-3 sm:w-36">
-                  <Image src={image.url} alt="" fill sizes="144px" className="object-cover" />
+                  {previewSrc(image) && <Image src={previewSrc(image)!} alt="" fill sizes="144px" className="object-cover" />}
+                  {isVideo(image) && (
+                    <span className="absolute right-2 bottom-2 inline-flex items-center gap-1 rounded-full bg-black/70 px-2 py-0.5 text-[11px] font-semibold">
+                      <Play aria-hidden="true" className="size-3 fill-white" /> Vidéo
+                    </span>
+                  )}
                   {index === 0 && (
                     <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-brand px-2 py-0.5 text-[11px] font-semibold">
                       <Star aria-hidden="true" className="size-3" /> Couverture
@@ -166,14 +242,14 @@ export function ProjectEditor({ project, defaultPillar }: ProjectEditorProps) {
           ) : (
             <>
               <ImagePlus aria-hidden="true" className="size-7 text-brand-3" />
-              <span className="text-sm font-medium">Choisir des images</span>
-              <span className="text-xs text-muted">JPEG, PNG, WebP, AVIF ou GIF</span>
+              <span className="text-sm font-medium">Choisir des images ou des vidéos</span>
+              <span className="text-xs text-muted">JPEG, PNG, WebP, AVIF, GIF · MP4, WebM, MOV</span>
             </>
           )}
           <input
             ref={fileInputRef}
             type="file"
-            accept={ALLOWED_IMAGE_TYPES.join(",")}
+            accept={[...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES].join(",")}
             multiple
             disabled={Boolean(uploading) || images.length >= MAX_IMAGES}
             onChange={(event) => handleFiles(event.target.files)}

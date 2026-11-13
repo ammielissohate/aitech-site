@@ -141,7 +141,7 @@ Vous ajoutez, modifiez et supprimez vos travaux **directement depuis le site**, 
 1. Allez sur **`/connexion`** (par exemple `https://votre-domaine.com/connexion`) et saisissez votre mot de passe.
 2. Une **barre « Mode admin »** apparaît en bas de l'écran, sur tout le site. Les galeries affichent des boutons **« + Ajouter un travail »**, et chaque carte un bouton **« Modifier »**. Les visiteurs ne voient jamais ces boutons.
 3. Dans le formulaire :
-   - envoyez vos images (jusqu'à 12, 10 Mo maximum chacune) ; la première sert de couverture ;
+   - envoyez vos images (10 Mo max.) et vos **vidéos de motion design** (MP4, WebM ou MOV, 250 Mo max.), jusqu'à 12 médias ; le premier sert de couverture. Pour une vidéo, une image de couverture est générée automatiquement ;
    - choisissez le **pôle** (Brand, Visibility ou Growth) et le **cadre** (client AiTech, poste salarié, projet personnel, formation) ;
    - décrivez le besoin, la solution et, seulement s'il est documenté, le résultat.
 4. **Publier** rend le travail visible immédiatement dans la galerie de l'accueil, sur la page `/realisations` et sur la page du pôle concerné. Décochez la case pour garder un **brouillon**, visible uniquement dans `/admin`.
@@ -180,7 +180,7 @@ Sans `DATABASE_URL` ni `BLOB_READ_WRITE_TOKEN`, le site fonctionne : la galerie 
 
 - Le mot de passe n'est jamais stocké dans le code. La session est un cookie signé (`httpOnly`, valable 7 jours), impossible à fabriquer sans `SESSION_SECRET`.
 - Chaque action (ajout, modification, suppression, envoi d'image) revérifie la session côté serveur. Les boutons masqués ne sont qu'un confort d'affichage.
-- Seules les images envoyées sur le stockage du site sont acceptées (JPEG, PNG, WebP, AVIF, GIF, 10 Mo maximum).
+- Seuls les médias envoyés sur le stockage du site sont acceptés : images (JPEG, PNG, WebP, AVIF, GIF, 10 Mo max.) et vidéos (MP4, WebM, MOV, 250 Mo max.). Conseil : exportez vos vidéos en 720p ou 1080p pour un chargement rapide.
 - `/admin`, `/connexion` et `/api` sont exclus des moteurs de recherche.
 - Pour changer de mot de passe : modifiez `ADMIN_PASSWORD` dans Vercel et redéployez. Pour déconnecter toutes les sessions ouvertes, changez aussi `SESSION_SECRET`.
 

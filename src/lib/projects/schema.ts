@@ -11,7 +11,9 @@ export const CONTEXT_VALUES = ["client-aitech", "salarie", "personnel", "formati
 
 export const MAX_IMAGES = 12;
 export const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10 Mo par image
+export const MAX_VIDEO_BYTES = 250 * 1024 * 1024; // 250 Mo par vidéo
 export const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"];
+export const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
 
 /** Seules les images hébergées sur le stockage Vercel Blob du site sont acceptées. */
 export function isBlobImageUrl(value: string): boolean {
@@ -36,6 +38,8 @@ export const projectImageSchema = z.object({
   width: z.number().int().positive(),
   height: z.number().int().positive(),
   alt: z.string().trim().max(200, "Le texte alternatif ne doit pas dépasser 200 caractères."),
+  kind: z.enum(["image", "video"]).optional(),
+  poster: z.string().refine(isBlobImageUrl, "Couverture de vidéo invalide.").optional(),
 });
 
 export const projectInputSchema = z.object({
@@ -76,8 +80,8 @@ export const projectInputSchema = z.object({
   published: z.boolean(),
   images: z
     .array(projectImageSchema)
-    .min(1, "Ajoutez au moins une image : c'est la preuve visuelle de votre travail.")
-    .max(MAX_IMAGES, `${MAX_IMAGES} images maximum par réalisation.`),
+    .min(1, "Ajoutez au moins une image ou une vidéo : c'est la preuve visuelle de votre travail.")
+    .max(MAX_IMAGES, `${MAX_IMAGES} médias maximum par réalisation.`),
 });
 
 export type ProjectInput = z.infer<typeof projectInputSchema>;

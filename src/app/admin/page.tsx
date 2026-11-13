@@ -9,6 +9,7 @@ import { projectContextLabels } from "@/data/projects";
 import { pillars } from "@/data/services";
 import { isAdmin, isAuthConfigured } from "@/lib/auth/session";
 import { isDatabaseConfigured } from "@/lib/db";
+import { previewSrc } from "@/lib/media";
 import { getAllProjectsForAdmin } from "@/lib/projects/repository";
 
 /**
@@ -98,12 +99,12 @@ async function AdminDashboard({ searchParams }: { searchParams: PageProps<"/admi
             ) : (
               <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {items.map((project) => {
-                  const cover = project.images[0];
+                  const coverSrc = previewSrc(project.images[0]);
                   return (
                     <li key={project.id} className="overflow-hidden rounded-2xl border border-line bg-ink-2">
                       <div className="relative aspect-[16/10] bg-ink-3">
-                        {cover && (
-                          <Image src={cover.url} alt="" fill sizes="(min-width: 1024px) 33vw, 50vw" className="object-cover" />
+                        {coverSrc && (
+                          <Image src={coverSrc} alt="" fill sizes="(min-width: 1024px) 33vw, 50vw" className="object-cover" />
                         )}
                         <span
                           className={`absolute top-3 left-3 rounded-full px-2.5 py-1 text-xs font-semibold ${
@@ -117,7 +118,7 @@ async function AdminDashboard({ searchParams }: { searchParams: PageProps<"/admi
                         <h3 className="font-display font-semibold">{project.title}</h3>
                         <p className="mt-1 text-xs text-muted">
                           {projectContextLabels[project.context]}
-                          {project.year && ` · ${project.year}`} · {project.images.length} image{project.images.length > 1 ? "s" : ""}
+                          {project.year && ` · ${project.year}`} · {project.images.length} média{project.images.length > 1 ? "s" : ""}
                         </p>
                         <div className="mt-4 flex items-center gap-2">
                           <Link

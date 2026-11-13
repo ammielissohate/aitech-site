@@ -121,12 +121,16 @@ export interface Founder {
  */
 export type ProjectContext = "client-aitech" | "salarie" | "personnel" | "formation";
 
-/** Image d'une réalisation, hébergée sur Vercel Blob. */
+/** Média d'une réalisation (image ou vidéo), hébergé sur Vercel Blob. */
 export interface ProjectImage {
   url: string;
   width: number;
   height: number;
   alt: string;
+  /** « video » pour une vidéo (motion design, montage…). Absent = image. */
+  kind?: "image" | "video";
+  /** Image de couverture d'une vidéo (affichée sur la carte et avant la lecture). */
+  poster?: string;
 }
 
 /**
